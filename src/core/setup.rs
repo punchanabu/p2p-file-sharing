@@ -1,5 +1,12 @@
+use futures::StreamExt;
+use libp2p::swarm::SwarmEvent;
+use crate::behaviour::behaviour::{MyBehaviorEvent};
+use tokio::sync::mpsc;
+use crate::core::reader::spawn_reader;
+use clap::Args;
+
 // Setup application: parses arguments, build the swarms, initialize an event loop.
-async fn setup() -> Result<(impl Stream<Item = SwarmEvent<MyBehaviorEvent>, String, mpsc::Receiver<String>>), Box<dyn Error>> {
+async fn setup() -> Result<(impl StreamExt<Item = SwarmEvent<MyBehaviorEvent>, String, mpsc::Receiver<String>>), Box<dyn Error>> {
     let args = Args::parse();
     let port = args.port.unwrap_or(0);
 

@@ -1,11 +1,11 @@
 use libp2p::{
     development_transport,
     identity,
-    mdns::Mdns,
+    mdns::tokio::Behaviour as TokioBehaviour,
     swarm::Swarm,
     PeerId,
 };
-use crate::behaviour::MyBehaviour;
+use crate::behaviour::behaviour::MyBehaviour;
 use std::error::Error;
 
 pub async fn build_swarm(port: u16) -> Result<(Swarm<MyBehaviour>, PeerId), Box<dyn Error>> {
@@ -14,7 +14,7 @@ pub async fn build_swarm(port: u16) -> Result<(Swarm<MyBehaviour>, PeerId), Box<
 
     let transport = development_transport(id_keys.clone()).await?;
 
-    let mdns = Mdns::new(Default::default()).await?;
+    let mdns = TokioBehaviour::new(Default::default(), peer_id).await?;
     let behaviour = MyBehaviour { mdns };
 
     let mut swarm = Swarm::new(transport, behaviour, peer_id);
