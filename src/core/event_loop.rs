@@ -1,12 +1,10 @@
-mod core;
-
 async fn event_loop(swarm: &mut impl Stream<Item = SwarmEvent<MyBehaviorEvent>>, stdin_rx: &mut mpsc::Receiver<String>) {
     loop {
         tokio::select! {
             // Handle: stdin input
             line = stdin_rx.recv() => {
                 if let Some(line) = line {
-                    println("You entered: {}", line);
+                    println!("You entered: {}", line);
                 }
             } else {
                 break;

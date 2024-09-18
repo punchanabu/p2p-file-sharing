@@ -1,5 +1,3 @@
-mod core;
-
 // Setup application: parses arguments, build the swarms, initialize an event loop.
 async fn setup() -> Result<(impl Stream<Item = SwarmEvent<MyBehaviorEvent>, String, mpsc::Receiver<String>>), Box<dyn Error>> {
     let args = Args::parse();

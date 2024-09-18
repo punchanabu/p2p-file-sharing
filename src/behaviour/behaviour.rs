@@ -1,22 +1,22 @@
 use libp2p::{
-    mdns::{Mdns, MdnsEvent},
-    swarm::{NetworkBehaviour, NetworkBehaviourActionEventProcess}
+    mdns::{Event as MdnsEvent, tokio::Behaviour as TokioBehaviour},
+    swarm::NetworkBehaviour,
 };
 
 #[derive(NetworkBehaviour)]
-#[behaviour(out_event = "MyBehaviourEvent")]
+#[behaviour(out_event = "MyBehaviorEvent")]
 pub struct MyBehaviour {
-    pub mdns: Mdns
+    pub mdns: TokioBehaviour,
 }
 
 #[derive(Debug)]
 pub enum MyBehaviorEvent {
-    Mdns(MdnsEvent),
+    Mdns(TokioBehaviour),
 }
 
-impl From<MdnsEvent> for MyBehaviourEvent {
+impl From<MdnsEvent> for MyBehaviorEvent {
     fn from(event: MdnsEvent) -> Self {
-        MyBehaviourEvent::Mdns(event)
+        MyBehaviorEvent::Mdns(event)
     }
 }
 

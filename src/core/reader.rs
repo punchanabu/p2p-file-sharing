@@ -1,6 +1,3 @@
-mod core;
-
-
 // Spawn a task to read input from stdin and send it through the provided channel.
 fn spawn_reader(stdin_tx: mpsc::Sender<String>) {
     tokio::spawn(async move {
