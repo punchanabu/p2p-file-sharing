@@ -1,12 +1,16 @@
-use futures::StreamExt;
+use futures::stream::Stream;
 use libp2p::swarm::SwarmEvent;
-use crate::behaviour::behaviour::{MyBehaviorEvent};
+use crate::behaviour::behaviour::MyBehaviorEvent;
 use tokio::sync::mpsc;
+use clap::Parser;
+use crate::cli::cli::Args;
 use crate::core::reader::spawn_reader;
-use clap::Args;
+use crate::network::network::build_swarm;
+use std::error::Error;
+use void::Void;
 
 // Setup application: parses arguments, build the swarms, initialize an event loop.
-async fn setup() -> Result<(impl StreamExt<Item = SwarmEvent<MyBehaviorEvent>, String, mpsc::Receiver<String>>), Box<dyn Error>> {
+pub async fn setup() -> Result<(impl Stream<Item = SwarmEvent<MyBehaviorEvent, Void>>, String, mpsc::Receiver<String>), Box<dyn Error>> {    
     let args = Args::parse();
     let port = args.port.unwrap_or(0);
 

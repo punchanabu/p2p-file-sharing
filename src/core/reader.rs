@@ -1,14 +1,27 @@
 use tokio::sync::mpsc;
-use tokio::io::BufReader;
+use tokio::io::{BufReader, AsyncBufReadExt};
+use tokio_stream::wrappers::LinesStream;
+use tokio_stream::StreamExt;
 
-// Spawn a task to read input from stdin and send it through the provided channel.
-pub(self) fn spawn_reader(stdin_tx: mpsc::Sender<String>) {
+pub fn spawn_reader(stdin_tx: mpsc::Sender<String>) {
     tokio::spawn(async move {
-        let mut stdin = BufReader::new(tokio::io::stdin()).line();
-        while let Some(line) = stdin.next_line().await.unwrap_or(None) {
-            if stdin_tx.send(line).await.is_err() {
-                break;
+        let reader = BufReader::new(tokio::io::stdin());
+        let lines = reader.lines();
+        let mut lines_stream = LinesStream::new(lines);
+
+        while let Some(line_result) = lines_stream.next().await {
+            match line_result {
+                Ok(line) => {
+                    if stdin_tx.send(line).await.is_err() {
+                        // The receiver has been dropped
+                        break;
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Error reading line: {}", e);
+                    break;
+                }
             }
         }
-    })
+    });
 }

@@ -9,9 +9,8 @@ pub struct MyBehaviour {
     pub mdns: TokioBehaviour,
 }
 
-#[derive(Debug)]
 pub enum MyBehaviorEvent {
-    Mdns(TokioBehaviour),
+    Mdns(MdnsEvent),
 }
 
 impl From<MdnsEvent> for MyBehaviorEvent {
