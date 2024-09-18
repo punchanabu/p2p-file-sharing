@@ -1,18 +1,32 @@
-async fn event_loop(swarm: &mut impl Stream<Item = SwarmEvent<MyBehaviorEvent>>, stdin_rx: &mut mpsc::Receiver<String>) {
+use futures::StreamExt;
+use libp2p::swarm::SwarmEvent;
+use crate::behaviour::behaviour::{MyBehaviorEvent, handle_mdns_event};
+use tokio::sync::mpsc;
+
+async fn event_loop(
+    swarm: &mut (impl StreamExt<Item = SwarmEvent<MyBehaviorEvent>> + Unpin), 
+    mut stdin_rx: mpsc::Receiver<String>
+) {
     loop {
         tokio::select! {
             // Handle: stdin input
             line = stdin_rx.recv() => {
-                if let Some(line) = line {
-                    println!("You entered: {}", line);
+                match line {
+                    Some(line) => {
+                        println!("You entered: {}", line);
+                    }
+                    None => {
+                        break;
+                    }
                 }
-            } else {
-                break;
             }
+            
 
             // Handle: swarm events
-            event = swarm.select_next_some() => {
-                handle_swarm_event(event);
+            event = swarm.next() => {
+                if let Some(event) = event {
+                    handle_swarm_event(event);
+                }
             }
         }
     }
@@ -22,7 +36,7 @@ async fn event_loop(swarm: &mut impl Stream<Item = SwarmEvent<MyBehaviorEvent>>,
 fn handle_swarm_event(event: SwarmEvent<MyBehaviorEvent>) {
     match event {
         SwarmEvent::NewListenAddr {address, ..} => {
-            println("Listening on: {}", address);
+            println!("Listening on: {}", address);
         }
         SwarmEvent::Behaviour(MyBehaviorEvent::Mdns(event)) => {
             handle_mdns_event(event);
