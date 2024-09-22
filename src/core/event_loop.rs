@@ -2,7 +2,6 @@ use futures::StreamExt;
 use libp2p::swarm::SwarmEvent;
 use crate::behaviour::behaviour::{MyBehaviorEvent, handle_mdns_event};
 use tokio::sync::mpsc;
-use std::io::Error;
 use void::Void;
 
 pub async fn event_loop(
@@ -36,6 +35,7 @@ pub async fn event_loop(
 
 // Handle: individual swarm events
 fn handle_swarm_event(event: SwarmEvent<MyBehaviorEvent, Void>) {
+    println!("Swarm event: {:?}", event);
     match event {
         SwarmEvent::NewListenAddr {address, ..} => {
             println!("Listening on: {}", address);

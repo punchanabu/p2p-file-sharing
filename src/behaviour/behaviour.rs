@@ -9,6 +9,7 @@ pub struct MyBehaviour {
     pub mdns: TokioBehaviour,
 }
 
+#[derive(Debug)]
 pub enum MyBehaviorEvent {
     Mdns(MdnsEvent),
 }
